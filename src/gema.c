@@ -15,7 +15,7 @@ static const char *caminhosTexturas[NUM_TIPOS_GEMA] = {
     "assets/images/gema_vermelha.png",  /* GEMA_VERMELHA */
     "assets/images/gema_azul.png",      /* GEMA_AZUL     */
     "assets/images/gema_milticor.png",     /* GEMA_MULTICOR    */
-    "assets/images/gema_amarela.png",   /* GEMA_AMARELA  */
+    "assets/images/gema_rosa.png",   /* GEMA_AMARELA  */
     "assets/images/gema_roxa.png",      /* GEMA_ROXA     */
     "assets/images/gema_laranja.png"    /* GEMA_LARANJA  */
 };

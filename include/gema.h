@@ -16,7 +16,7 @@ typedef enum {
     GEMA_VERMELHA = 0,
     GEMA_AZUL=1,
     GEMA_MULTICOR=2,
-    GEMA_AMARELA=3,
+    GEMA_ROSA=3,
     GEMA_ROXA=4,
     GEMA_LARANJA=5,
     NUM_TIPOS_GEMA,      /* = 6, quantidade de tipos válidos */
