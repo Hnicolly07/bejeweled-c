@@ -1,7 +1,7 @@
 #ifndef GEMA_H
 #define GEMA_H
 
-#include "raylib.h"
+#include <raylib.h>
 #include <stdbool.h>
 
 /* 

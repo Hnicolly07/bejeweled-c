@@ -1,0 +1,4 @@
+# copie este arquivo e renomeie para config.mk
+#aqui vocês vão mudar pro caminho da raylib no pc de vcs
+
+RAYLIB_PATH = C:/caminho/para/raylib/src

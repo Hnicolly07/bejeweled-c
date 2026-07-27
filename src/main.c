@@ -2,6 +2,7 @@
 #include <time.h>
 #include <gema.h>
 #include <tabuleiro.h>
+#include <render.h>
 
 int main(){
     // inicializar a janela
@@ -15,10 +16,13 @@ int main(){
     // pra funcionamento da função gema_sortearTipo
     SetRandomSeed((unsigned int)time(NULL));
 
+    //
+    gema_carregarTexturas();
+
     Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
 
     tabuleiro_inicializar(tabuleiro); 
-    tabuleiro_imprimir(tabuleiro); 
+    //tabuleiro_imprimir(tabuleiro); 
 
     //parte gráfica do raylib
     while(!WindowShouldClose()){
@@ -26,11 +30,13 @@ int main(){
         BeginDrawing();
         ClearBackground(WHITE);
 
-        DrawText("Deu certo!",230, 210, 30, PURPLE);
+        renderizar(tabuleiro);
+        //DrawText("Deu certo!",230, 210, 30, PURPLE);
 
         EndDrawing();
     }
 
+    gema_descarregarTexturas();
     CloseWindow();
 
     return 0;
