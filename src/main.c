@@ -36,6 +36,11 @@ int main(){
         BeginDrawing();
         ClearBackground(WHITE);
 
+        int lin,col;
+        if(obterGemaClicada(&lin,&col)){
+            // Exibe no console qual gema foi clicada.
+            TraceLog(LOG_INFO, TextFormat("Gema clicada -> linha: %i coluna: %i",lin,col));
+        }
         renderizar(tabuleiro);
         //DrawText("Deu certo!",230, 210, 30, PURPLE);
 
