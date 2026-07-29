@@ -17,4 +17,12 @@ void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TA
 
 bool tabuleiro_tem_combinacao(bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
 
+/*
+ * Verifica se existe pelo menos uma jogada possível.
+ * A função testa trocas entre gemas vizinhas e verifica
+ * se alguma delas gera uma combinação de 3 ou mais.
+ */
+bool tabuleiro_existe_jogada_possivel(
+    Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
+
 #endif

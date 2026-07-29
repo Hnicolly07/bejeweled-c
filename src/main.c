@@ -24,12 +24,23 @@ int main(){
     tabuleiro_inicializar(tabuleiro); 
     //tabuleiro_imprimir(tabuleiro); 
 
+    bool jogoEncerrado = false;
+
+    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){
+        jogoEncerrado = true;
+    }
+
     //parte gráfica do raylib
-    while(!WindowShouldClose()){
+    while(!WindowShouldClose() && !jogoEncerrado){
         //lógica principal
         BeginDrawing();
         ClearBackground(WHITE);
 
+        int lin,col;
+        if(obterGemaClicada(&lin,&col)){
+            // Exibe no console qual gema foi clicada.
+            TraceLog(LOG_INFO, TextFormat("Gema clicada -> linha: %i coluna: %i",lin,col));
+        }
         renderizar(tabuleiro);
         //DrawText("Deu certo!",230, 210, 30, PURPLE);
 
