@@ -2,9 +2,10 @@
 #define RENDER_H
 
 #include <tabuleiro.h>
-#include <gema.h>
+
+#define TAMANHO_CELULA 40
 
 void renderizar(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
-bool obterGemaClicada(int *linha,int *coluna);
+bool obter_gema_clicada(int *linha,int *coluna);
 
 #endif
