@@ -20,7 +20,7 @@ static const char *caminhosTexturas[NUM_TIPOS_GEMA] = {
     "assets/images/gema_laranja.png"    /* GEMA_LARANJA  */
 };
 
-void gema_carregarTexturas(void)
+void gema_carregar_texturas(void)
 {
     if (texturasCarregadas) return; /* evita carregar duas vezes */
 
@@ -37,7 +37,7 @@ void gema_carregarTexturas(void)
     texturasCarregadas = true;
 }
 
-void gema_descarregarTexturas(void)
+void gema_descarregar_texturas(void)
 {
     if (!texturasCarregadas) return;
 
@@ -47,7 +47,7 @@ void gema_descarregarTexturas(void)
     texturasCarregadas = false;
 }
 
-Texture2D gema_obterTextura(TipoGema tipo)
+Texture2D gema_obter_textura(TipoGema tipo)
 {
     /* tipo == GEMA_VAZIA (-1) nunca deveria chegar aqui */
     return texturasGemas[tipo];
@@ -60,7 +60,7 @@ Gema gema_criar(TipoGema tipo)
     return g;
 }
 
-TipoGema gema_sortearTipo(void)
+TipoGema gema_sortear_tipo(void)
 {
     /* GetRandomValue é da própria raylib pelo q eu vi, mas n consigo testar ainda, min e max INCLUSIVOS.
       No main.c: chamem SetRandomSeed((unsigned int)time(NULL)) uma
@@ -69,9 +69,9 @@ TipoGema gema_sortearTipo(void)
     return (TipoGema)GetRandomValue(0, NUM_TIPOS_GEMA - 1);
 }
 
-Gema gema_criarAleatoria(void)
+Gema gema_criar_aleatoria(void)
 {
-    return gema_criar(gema_sortearTipo());
+    return gema_criar(gema_sortear_tipo());
 }
 
 bool gema_igual(Gema a, Gema b)
@@ -84,7 +84,7 @@ void gema_desenhar(Gema g, int x, int y, int tamanho)
 {
     if (g.tipo == GEMA_VAZIA) return; /* nada a desenhar */
 
-    Texture2D tex = gema_obterTextura(g.tipo);
+    Texture2D tex = gema_obter_textura(g.tipo);
 
     /* Escala a textura original pra caber
      no quadrado "tamanho x tamanho" da célula da matriz. */

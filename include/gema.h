@@ -36,13 +36,13 @@ typedef struct {
 /* 
  3) GERENCIAMENTO DE TEXTURAS (as imagens ficam em assets/images)
   Carrega todas as texturas de gema uma única vez (chamar no início do programa, depois de InitWindow). */
-void gema_carregarTexturas(void);
+void gema_carregar_texturas();
 
 /* Libera todas as texturas (chamar antes de CloseWindow). */
-void gema_descarregarTexturas(void);
+void gema_descarregar_texturas();
 
 /* Retorna a textura associada a um tipo de gema. */
-Texture2D gema_obterTextura(TipoGema tipo);
+Texture2D gema_obter_textura(TipoGema tipo);
 
 /* 4) CRIAÇÃO / SORTEIO DE GEMAS  */
 
@@ -50,10 +50,10 @@ Texture2D gema_obterTextura(TipoGema tipo);
 Gema gema_criar(TipoGema tipo);
 
 /* Sorteia um tipo válido  */
-TipoGema gema_sortearTipo(void);
+TipoGema gema_sortear_tipo();
 
 /* Cria uma gema com tipo sorteado aleatoriamente. */
-Gema gema_criarAleatoria(void);
+Gema gema_criar_aleatoria();
 
 
 /* Compara duas gemas (considera vazia como diferente de qualquer coisa). */

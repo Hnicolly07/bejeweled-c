@@ -3,6 +3,7 @@
 #include <gema.h>
 #include <tabuleiro.h>
 #include <render.h>
+#include <jogo.h>
 
 int main(){
     // inicializar a janela
@@ -13,41 +14,38 @@ int main(){
     InitWindow(largura, altura,"Bejeweled-c");
     SetTargetFPS(60);
 
-    // pra funcionamento da função gema_sortearTipo
+    // pra funcionamento da função gema_sortear_tipo
     SetRandomSeed((unsigned int)time(NULL));
 
-    //
-    gema_carregarTexturas();
+    //sempre tem que carregar as texturas
+    gema_carregar_texturas();
 
     Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
 
-    tabuleiro_inicializar(tabuleiro); 
-    //tabuleiro_imprimir(tabuleiro); 
+    tabuleiro_inicializar(tabuleiro);
 
     bool jogoEncerrado = false;
-
-    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){
+    //ainda vai ser atualizada em jogo qd houver uma condição maior de parada do jogo, por enquanto ta aqui
+    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){ 
         jogoEncerrado = true;
     }
 
-    //parte gráfica do raylib
+    //isso aq vai ficar rodando até q a janela seja fechada
     while(!WindowShouldClose() && !jogoEncerrado){
+        jogo_atualizar(); //coloquei o tracelog em jogo.c
+        
         //lógica principal
         BeginDrawing();
-        ClearBackground(WHITE);
+        //vai mudar dps pro papel de parede
+        ClearBackground(PINK); //n precisa ligar pra essa cor é só q o branco tava agoniando
 
-        int lin,col;
-        if(obterGemaClicada(&lin,&col)){
-            // Exibe no console qual gema foi clicada.
-            TraceLog(LOG_INFO, TextFormat("Gema clicada -> linha: %i coluna: %i",lin,col));
-        }
         renderizar(tabuleiro);
-        //DrawText("Deu certo!",230, 210, 30, PURPLE);
-
         EndDrawing();
     }
-
-    gema_descarregarTexturas();
+    
+    // e descarregar no final
+    gema_descarregar_texturas();
+    //fechar a janela
     CloseWindow();
 
     return 0;
