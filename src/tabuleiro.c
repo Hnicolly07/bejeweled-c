@@ -68,6 +68,21 @@ void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TA
     }
 }
 
+void tabuleiro_remover_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
+                                  bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+    tabuleiro_detectar_combinacoes(tabuleiro, marcado);
+
+    if(!tabuleiro_tem_combinacao(marcado)){
+        return;
+    }
+
+    for(int i = 0; i < TAMANHO_TABULEIRO; i++){
+        for(int j = 0; j < TAMANHO_TABULEIRO; j++){
+            if(marcado[i][j]){
+                tabuleiro[i][j].tipo = GEMA_VAZIA;}}}
+}
+
+/* Retorna true se o array de marcação contém pelo menos uma gema combinada. */
 bool tabuleiro_tem_combinacao(bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     for(int i=0; i<TAMANHO_TABULEIRO; i++){
         for(int j=0; j<TAMANHO_TABULEIRO; j++){

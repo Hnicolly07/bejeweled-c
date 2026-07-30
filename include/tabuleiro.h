@@ -11,6 +11,9 @@ void tabuleiro_inicializar(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO])
 //função pra encontrar as combinações tanto hotizontais tanto verticais
 void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
 
+// remove as gemas que fazem parte de trios detectados no tabuleiro
+void tabuleiro_remover_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
+
 bool tabuleiro_tem_combinacao(bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
 
 /*
