@@ -27,8 +27,13 @@ void jogo_atualizar(){
 
                 if(gemas_vizinhas(linha1,coluna1,linha2,coluna2) && troca_gera_trio(tabuleiro,linha1,coluna1,linha2,coluna2)){
                     trocar_gemas(tabuleiro,linha1, coluna1,linha2,coluna2);
-                    tabuleiro_remover_combinacoes(tabuleiro);
-                    efeito_cascata(tabuleiro);
+                    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]; 
+                    
+                    do{
+                        tabuleiro_remover_combinacoes(tabuleiro);
+                        efeito_cascata(tabuleiro);
+                        tabuleiro_detectar_combinacoes(tabuleiro, marcado);
+                    }while(tabuleiro_tem_combinacao(marcado));
                 }
 
                 linha1 = -1; //reiniciar os valores 
