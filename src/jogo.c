@@ -87,27 +87,33 @@ void jogo_atualizar_telas(){
 void jogo_renderizar(){
     switch(estadoAtual){
         case ESTADO_TELA_INICIAL:
+            renderizar_fundo(false);
             interface_tela_inicial();
             break;
 
         case ESTADO_INSTRUCOES:
+            renderizar_fundo(true);
             interface_tela_instrucoes();
             break;
 
         case ESTADO_CONFIGURACOES:
+            renderizar_fundo(true);
             interface_tela_configuracoes();
             break;
 
         case ESTADO_JOGANDO:
+            renderizar_fundo(true);
             renderizar(tabuleiro);
             break;
 
         case ESTADO_PAUSADO:
+            renderizar_fundo(true);
             renderizar(tabuleiro);
             DrawText("PAUSADO - aperte P para continuar", 20, 20, 20, WHITE); //ainda atualizar
             break;
 
         case ESTADO_GAME_OVER:
+            renderizar_fundo(true);
             interface_tela_final(pontuacao);
             break;
     }

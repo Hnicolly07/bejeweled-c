@@ -4,7 +4,6 @@
 #include <time.h>
 #include <gema.h>
 #include <tabuleiro.h>
-#include <render.h>
 #include <jogo.h>
 
 int main(){
@@ -18,7 +17,6 @@ int main(){
 
     // pra funcionamento da função gema_sortear_tipo
     SetRandomSeed((unsigned int)time(NULL));
-
     //sempre tem que carregar as texturas
     gema_carregar_texturas();
 

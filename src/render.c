@@ -1,4 +1,34 @@
 #include <render.h>
+#include <stdbool.h>
+
+static Texture2D texturaFundo;
+static Texture2D texturaFundoDesfoque;
+static bool fundosCarregados = false;
+
+void renderizar_fundo(bool desfocado){
+    //carrega os fundos na primeira vez que for desenhar
+    if (!fundosCarregados) {
+        texturaFundo = LoadTexture("assets/images/PlanoDeFundo.png");
+        texturaFundoDesfoque = LoadTexture("assets/images/PlanoDeFundoDesfoque.png");
+        fundosCarregados = true;
+    }
+
+    /* um if/else Escolhe qual textura será usada, dependendo do valor de desfocado
+    */
+        Texture2D tex;
+        if (desfocado) {
+            tex = texturaFundoDesfoque;
+        } else {
+            tex = texturaFundo;
+        }
+            if (tex.id == 0) return;
+
+    //estica a imagem (32x144) pra cobrir a janela inteira,função do raylib.
+    DrawTexturePro(tex,
+        (Rectangle){ 0, 0, (float)tex.width, (float)tex.height },
+        (Rectangle){ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() },
+        (Vector2){ 0, 0 }, 0.0f, WHITE);
+}
 
 //eu acredito que a gente poderia manter essas variaveis em uma só já que é o msm tamanho, vcs podem perguntar pro professor pf
 //largura é o TAMANHO_TABULEIRO que é 8 vezes o tamanho de cada quadradinho
