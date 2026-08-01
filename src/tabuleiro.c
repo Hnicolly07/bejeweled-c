@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <tabuleiro.h>
+#include <stdlib.h>
 
 
 void tabuleiro_inicializar(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
@@ -18,8 +19,7 @@ void tabuleiro_inicializar(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO])
     }while(!tabuleiro_existe_jogada_possivel(tabuleiro)); //enquanto não houverem jogadas possiveis
 }
 
-void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
-                                    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
 
     for(int i=0; i<TAMANHO_TABULEIRO; i++){
         for(int j=0; j<TAMANHO_TABULEIRO; j++){
@@ -68,8 +68,9 @@ void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TA
     }
 }
 
-void tabuleiro_remover_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
-                                  bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+void tabuleiro_remover_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {false};
+
     tabuleiro_detectar_combinacoes(tabuleiro, marcado);
 
     if(!tabuleiro_tem_combinacao(marcado)){
@@ -79,10 +80,13 @@ void tabuleiro_remover_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TAB
     for(int i = 0; i < TAMANHO_TABULEIRO; i++){
         for(int j = 0; j < TAMANHO_TABULEIRO; j++){
             if(marcado[i][j]){
-                tabuleiro[i][j].tipo = GEMA_VAZIA;}}}
+                tabuleiro[i][j].tipo = GEMA_VAZIA;
+            }
+        }
+    }
 }
 
-/* Retorna true se o array de marcação contém pelo menos uma gema combinada. */
+//Retorna true se o array de marcação contém pelo menos uma gema combinada
 bool tabuleiro_tem_combinacao(bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     for(int i=0; i<TAMANHO_TABULEIRO; i++){
         for(int j=0; j<TAMANHO_TABULEIRO; j++){
@@ -92,7 +96,7 @@ bool tabuleiro_tem_combinacao(bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]
     return false;
 }
  
-// Retorna true quando a posição (linha,coluna) faz parte de uma combinação horizontal ou vertical.
+// Retorna true quando a posição (linha,coluna) faz parte de uma combinação horizontal ou vertical
 bool possui_trio_local(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha, int coluna){
     int cont = 1;
     //pra esquerda
@@ -161,4 +165,32 @@ bool tabuleiro_existe_jogada_possivel(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_
         }
     }
     return false;
+}
+
+bool gemas_vizinhas(int linha1, int coluna1, int linha2, int coluna2){
+    if(abs(linha1 - linha2) + abs(coluna1 - coluna2) == 1){
+        return true;
+    }
+
+    return false;
+}
+
+void efeito_cascata(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+    for(int i = TAMANHO_TABULEIRO-1; i>=0; i--){
+        for(int j = 0; j<TAMANHO_TABULEIRO; j++){
+                if(tabuleiro[i][j].tipo == GEMA_VAZIA){
+                    int atual = i-1; // utilizando essa variavel pra n ficar alterando diretamente o valor de i
+                    while(atual >= 0 && tabuleiro[atual][j].tipo == GEMA_VAZIA){ // se não for a primeira linha pq n dá pra olhar acima
+                        atual--;
+                    } 
+                
+                    if(atual >= 0){
+                        tabuleiro[i][j] = tabuleiro[atual][j];
+                        tabuleiro[atual][j].tipo = GEMA_VAZIA;
+                    } else{
+                        tabuleiro[i][j] = gema_criar_aleatoria(); //caso tiver percorrido tudo e n encontrou gema pra descer, cria uma nova
+                    }
+                } 
+        }
+    }
 }

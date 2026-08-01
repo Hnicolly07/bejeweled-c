@@ -1,3 +1,5 @@
+//ESSE ARQUIVO DEVE APENAS CONTROLAR O FLUXO DO PROGRAMA
+// NÃO DEVE CONTROLAR TABULEIRO, GEMAS, NADA, APENAS CHAMAR
 #include <raylib.h>
 #include <time.h>
 #include <gema.h>
@@ -20,26 +22,18 @@ int main(){
     //sempre tem que carregar as texturas
     gema_carregar_texturas();
 
-    Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
-
-    tabuleiro_inicializar(tabuleiro);
-
-    bool jogoEncerrado = false;
-    //ainda vai ser atualizada em jogo qd houver uma condição maior de parada do jogo, por enquanto ta aqui
-    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){ 
-        jogoEncerrado = true;
-    }
+    jogo_inicializar();
 
     //isso aq vai ficar rodando até q a janela seja fechada
-    while(!WindowShouldClose() && !jogoEncerrado){
-        jogo_atualizar(); //coloquei o tracelog em jogo.c
-        
+    while(!WindowShouldClose() && !jogo_encerrar()){
         //lógica principal
+        jogo_atualizar();
+        
         BeginDrawing();
         //vai mudar dps pro papel de parede
         ClearBackground(PINK); //n precisa ligar pra essa cor é só q o branco tava agoniando
 
-        renderizar(tabuleiro);
+        jogo_renderizar();
         EndDrawing();
     }
     

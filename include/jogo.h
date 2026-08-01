@@ -2,9 +2,12 @@
 #define JOGO_H
 
 #include <tabuleiro.h>
+void jogo_inicializar();
 
 void jogo_atualizar();
 
-//bool jogo_encerrado(); definir quando tiver uma condição de encerramento
+void jogo_renderizar();
+
+bool jogo_encerrar();
 
 #endif
