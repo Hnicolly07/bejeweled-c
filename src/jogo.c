@@ -3,11 +3,14 @@
 #include <raylib.h>
 #include <render.h>
 
+int pontuacao = 0;
+
 Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
 int linha1 = -1; //um valor que não está entre os possiveis indices pra linha e coluna
 int coluna1 = -1;
 
 void jogo_inicializar(){
+    pontuacao = 0;
     tabuleiro_inicializar(tabuleiro);
 }
 
@@ -28,8 +31,8 @@ void jogo_atualizar(){
                 if(gemas_vizinhas(linha1,coluna1,linha2,coluna2) && troca_gera_trio(tabuleiro,linha1,coluna1,linha2,coluna2)){
                     trocar_gemas(tabuleiro,linha1, coluna1,linha2,coluna2);
                     bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]; 
-                    
                     do{
+                        pontuacao += 10;
                         tabuleiro_remover_combinacoes(tabuleiro);
                         efeito_cascata(tabuleiro);
                         tabuleiro_detectar_combinacoes(tabuleiro, marcado);
@@ -45,6 +48,7 @@ void jogo_atualizar(){
 
 void jogo_renderizar(){
     renderizar(tabuleiro);
+    DrawText(TextFormat("SCORE: %d", pontuacao),20,20,30,WHITE);
 }
 
 //aqui colocar a função de jogo encerrado
