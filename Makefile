@@ -14,7 +14,8 @@ SRC = \
 	src/gema.c \
 	src/tabuleiro.c \
 	src/render.c \
-	src/jogo.c
+	src/jogo.c 	\
+	src/interface.c
 
 CFLAGS = -Wall -Wextra -std=c11 \
 	-Iinclude \
