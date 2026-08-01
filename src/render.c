@@ -60,6 +60,32 @@ void renderizar(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     }
 }
 
+void renderizar_botoes_jogo(){
+    // botão de dica: retângulo com texto e custo
+    DrawRectangle(BOTAO_X, BOTAO_DICA_Y, BOTAO_LARGURA, BOTAO_ALTURA, (Color){ 50, 50, 100, 220 });
+    DrawRectangleLines(BOTAO_X, BOTAO_DICA_Y, BOTAO_LARGURA, BOTAO_ALTURA, RAYWHITE);
+    DrawText("Dica  (-10)", BOTAO_X + 15, BOTAO_DICA_Y + 12, 18, WHITE);
+
+    // botão de desfazer: retângulo com texto e custo
+    DrawRectangle(BOTAO_X, BOTAO_DESFAZER_Y, BOTAO_LARGURA, BOTAO_ALTURA, (Color){ 100, 50, 50, 220 });
+    DrawRectangleLines(BOTAO_X, BOTAO_DESFAZER_Y, BOTAO_LARGURA, BOTAO_ALTURA, RAYWHITE);
+    DrawText("Desfazer (-10)", BOTAO_X + 15, BOTAO_DESFAZER_Y + 12, 18, WHITE);
+}
+
+void renderizar_dica(int linha1, int coluna1, int linha2, int coluna2){
+    // desenha um contorno vermelho nas duas células sugeridas pela dica
+    const int offsetX = (GetScreenWidth()  - larguraTabuleiro)/2;
+    const int offsetY = (GetScreenHeight() - alturaTabuleiro)/2;
+
+    int x1 = offsetX + coluna1 * TAMANHO_CELULA;
+    int y1 = offsetY + linha1 * TAMANHO_CELULA;
+    DrawRectangleLinesEx((Rectangle){ x1, y1, TAMANHO_CELULA, TAMANHO_CELULA }, 3, RED);
+
+    int x2 = offsetX + coluna2 * TAMANHO_CELULA;
+    int y2 = offsetY + linha2 * TAMANHO_CELULA;
+    DrawRectangleLinesEx((Rectangle){ x2, y2, TAMANHO_CELULA, TAMANHO_CELULA }, 3, RED);
+}
+
 bool obter_gema_clicada(int *linha,int *coluna){
     //movi pra cá pq se n houver clique ele já retorna false direto sem criar as variaveis de posição e os offsets
     // Verifica se houve clique esquerdo.
