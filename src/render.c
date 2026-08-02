@@ -1,4 +1,34 @@
 #include <render.h>
+#include <stdbool.h>
+
+static Texture2D texturaFundo;
+static Texture2D texturaFundoDesfoque;
+static bool fundosCarregados = false;
+
+void renderizar_fundo(bool desfocado){
+    //carrega os fundos na primeira vez que for desenhar
+    if (!fundosCarregados) {
+        texturaFundo = LoadTexture("assets/images/PlanoDeFundo.png");
+        texturaFundoDesfoque = LoadTexture("assets/images/PlanoDeFundoDesfoque.png");
+        fundosCarregados = true;
+    }
+
+    /* um if/else Escolhe qual textura será usada, dependendo do valor de desfocado
+    */
+        Texture2D tex;
+        if (desfocado) {
+            tex = texturaFundoDesfoque;
+        } else {
+            tex = texturaFundo;
+        }
+            if (tex.id == 0) return;
+
+    //estica a imagem (32x144) pra cobrir a janela inteira,função do raylib.
+    DrawTexturePro(tex,
+        (Rectangle){ 0, 0, (float)tex.width, (float)tex.height },
+        (Rectangle){ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() },
+        (Vector2){ 0, 0 }, 0.0f, WHITE);
+}
 
 //eu acredito que a gente poderia manter essas variaveis em uma só já que é o msm tamanho, vcs podem perguntar pro professor pf
 //largura é o TAMANHO_TABULEIRO que é 8 vezes o tamanho de cada quadradinho
@@ -28,6 +58,32 @@ void renderizar(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
             gema_desenhar(tabuleiro[i][j], x, y, TAMANHO_CELULA);
         }
     }
+}
+
+void renderizar_botoes_jogo(){
+    // botão de dica: retângulo com texto e custo
+    DrawRectangle(BOTAO_X, BOTAO_DICA_Y, BOTAO_LARGURA, BOTAO_ALTURA, (Color){ 50, 50, 100, 220 });
+    DrawRectangleLines(BOTAO_X, BOTAO_DICA_Y, BOTAO_LARGURA, BOTAO_ALTURA, RAYWHITE);
+    DrawText("Dica  (-10)", BOTAO_X + 15, BOTAO_DICA_Y + 12, 18, WHITE);
+
+    // botão de desfazer: retângulo com texto e custo
+    DrawRectangle(BOTAO_X, BOTAO_DESFAZER_Y, BOTAO_LARGURA, BOTAO_ALTURA, (Color){ 100, 50, 50, 220 });
+    DrawRectangleLines(BOTAO_X, BOTAO_DESFAZER_Y, BOTAO_LARGURA, BOTAO_ALTURA, RAYWHITE);
+    DrawText("Desfazer (-10)", BOTAO_X + 15, BOTAO_DESFAZER_Y + 12, 18, WHITE);
+}
+
+void renderizar_dica(int linha1, int coluna1, int linha2, int coluna2){
+    // desenha um contorno vermelho nas duas células sugeridas pela dica
+    const int offsetX = (GetScreenWidth()  - larguraTabuleiro)/2;
+    const int offsetY = (GetScreenHeight() - alturaTabuleiro)/2;
+
+    int x1 = offsetX + coluna1 * TAMANHO_CELULA;
+    int y1 = offsetY + linha1 * TAMANHO_CELULA;
+    DrawRectangleLinesEx((Rectangle){ x1, y1, TAMANHO_CELULA, TAMANHO_CELULA }, 3, RED);
+
+    int x2 = offsetX + coluna2 * TAMANHO_CELULA;
+    int y2 = offsetY + linha2 * TAMANHO_CELULA;
+    DrawRectangleLinesEx((Rectangle){ x2, y2, TAMANHO_CELULA, TAMANHO_CELULA }, 3, RED);
 }
 
 bool obter_gema_clicada(int *linha,int *coluna){

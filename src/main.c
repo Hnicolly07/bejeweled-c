@@ -4,7 +4,6 @@
 #include <time.h>
 #include <gema.h>
 #include <tabuleiro.h>
-#include <render.h>
 #include <jogo.h>
 
 int main(){
@@ -18,7 +17,6 @@ int main(){
 
     // pra funcionamento da função gema_sortear_tipo
     SetRandomSeed((unsigned int)time(NULL));
-
     //sempre tem que carregar as texturas
     gema_carregar_texturas();
 
@@ -26,8 +24,8 @@ int main(){
 
     //isso aq vai ficar rodando até q a janela seja fechada
     while(!WindowShouldClose() && !jogo_encerrar()){
-        //lógica principal
-        jogo_atualizar();
+        //lógica principal (fluxo por estado/tela)
+        jogo_atualizar_telas();
         
         BeginDrawing();
         //vai mudar dps pro papel de parede

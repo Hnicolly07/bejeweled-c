@@ -10,10 +10,92 @@ int coluna1 = -1;
 
 int pontuacao = 0;
 
-EstadoJogo estadoAtual = ESTADO_TELA_INICIAL; //primeira tela lá do enum, ainda n foi definida em interface
+/* ===== ESTADO DAS MECÂNICAS DE DICA E DESFAZER =====*/
+// Dica: guarda as células sugeridas e se o destaque está ativo
+int dicaLinha1 = -1, dicaColuna1 = -1, dicaLinha2 = -1, dicaColuna2 = -1;
+bool dicaAtiva = false;
+
+// Desfazer: guarda uma cópia do tabuleiro antes da última jogada válida
+Gema backupTabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
+int pontuacaoBackup = 0; // pontuação antes da jogada (para restaurar junto)
+bool temBackup = false;  // indica se existe um estado salvo para desfazer
+
+// custo fixo aplicado nas duas mecânicas
+#define CUSTO_DICA 10
+#define CUSTO_DESFAZER 10
+
+EstadoJogo estadoAtual = ESTADO_TELA_INICIAL; //o jogo começa na tela inicial (menu)
+
 
 void jogo_inicializar(){
     tabuleiro_inicializar(tabuleiro);
+}
+
+/* FUNÇÃO DE DICA 
+ A dica usa a função já tabuleiro_existe_jogada_possivel(), que
+ percorre o tabuleiro testando trocas e devolve true se existe alguma jogada
+ que forma trio. Como ela não devolve as coordenadas, uma busca auxiliar local
+ (abaixo) encontra e guarda a primeira jogada válida para o renderizador
+ destacar. A função existente NÃO é alterada. Custa CUSTO_DICA pontos.*/
+static bool encontrar_jogada_para_dica(){
+    // percorre o tabuleiro com a mesma lógica, usando troca_gera_trio(),
+    // guardando as coordenadas da primeira troca que forma trio
+    for(int i = 0; i < TAMANHO_TABULEIRO; i++){
+        for(int j = 0; j < TAMANHO_TABULEIRO; j++){
+            if(j + 1 < TAMANHO_TABULEIRO && troca_gera_trio(tabuleiro, i, j, i, j + 1)){
+                dicaLinha1 = i; dicaColuna1 = j;
+                dicaLinha2 = i; dicaColuna2 = j + 1;
+                return true;
+            }
+            if(i + 1 < TAMANHO_TABULEIRO && troca_gera_trio(tabuleiro, i, j, i + 1, j)){
+                dicaLinha1 = i; dicaColuna1 = j;
+                dicaLinha2 = i + 1; dicaColuna2 = j;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void usar_dica(){
+    if(pontuacao < CUSTO_DICA) return; // não deixa usar se não tiver pontos suficientes
+
+    dicaAtiva = false;
+    dicaLinha1 = dicaColuna1 = dicaLinha2 = dicaColuna2 = -1;
+
+    // usa a função já existente que percorre o tabuleiro procurando jogada possível
+    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){
+        return; // não há jogada que forme trio; não gasta pontos
+    }
+
+    // encontra as coordenadas da jogada para destacar (sem alterar a função existente)
+    if(encontrar_jogada_para_dica()){
+        dicaAtiva = true;
+        pontuacao -= CUSTO_DICA; // aplica o custo fixo
+    }
+}
+
+/* FUNÇÃO DE DESFAZER
+Restaura o tabuleiro e a pontuação para o estado salvo antes da última
+jogada válida (backup), usando tabuleiro_copiar(). Custa CUSTO_DESFAZER pontos.*/ 
+void desfazer_jogada(){
+    if(!temBackup) return; // não há nada para desfazer
+    if(pontuacao < CUSTO_DESFAZER) return; // sem pontos suficientes
+
+    // restaura a matriz do backup (função já existente)
+    tabuleiro_copiar(backupTabuleiro, tabuleiro);
+    // restaura a pontuação do momento salvo
+    pontuacao = pontuacaoBackup - CUSTO_DESFAZER;
+    temBackup = false; // o backup foi consumido
+    dicaAtiva = false; // limpa a dica, pois o tabuleiro mudou
+}
+
+//FUNÇÃO DE SALVAR ESTADO (antes de cada jogada válida)
+// Guarda o tabuleiro e a pontuação atuais para permitir o desfazer depois.
+void salvar_estado(){
+    tabuleiro_copiar(tabuleiro, backupTabuleiro); // copia a matriz para o backup
+    pontuacaoBackup = pontuacao;                   // guarda a pontuação atual
+    temBackup = true;                              // marca que existe backup
 }
 
 //parte q emilly tinha colocado no loop principal, só passei pra cá pra ficar mais separado pq essa parte ainda vai aumentar
@@ -22,6 +104,23 @@ void jogo_atualizar(){
     if(IsKeyPressed(KEY_P)){
         estadoAtual = ESTADO_PAUSADO;
         return;
+    }
+
+    //CLIQUE NOS BOTÕES DA TELA (Dica e Desfazer)
+    if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        Vector2 mouse = GetMousePosition();
+        // clique dentro do botão de dica
+        if(mouse.x >= BOTAO_X && mouse.x <= BOTAO_X + BOTAO_LARGURA &&
+           mouse.y >= BOTAO_DICA_Y && mouse.y <= BOTAO_DICA_Y + BOTAO_ALTURA){
+            usar_dica();
+            return;
+        }
+        // clique dentro do botão de desfazer
+        if(mouse.x >= BOTAO_X && mouse.x <= BOTAO_X + BOTAO_LARGURA &&
+           mouse.y >= BOTAO_DESFAZER_Y && mouse.y <= BOTAO_DESFAZER_Y + BOTAO_ALTURA){
+            desfazer_jogada();
+            return;
+        }
     }
 
     int lin, col;
@@ -35,20 +134,30 @@ void jogo_atualizar(){
                 int coluna2 = col;
 
                 if(gemas_vizinhas(linha1,coluna1,linha2,coluna2) && troca_gera_trio(tabuleiro,linha1,coluna1,linha2,coluna2)){
+                    salvar_estado(); // guarda o estado atual antes da jogada (para o desfazer)
                     trocar_gemas(tabuleiro,linha1, coluna1,linha2,coluna2);
-                    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]; 
-                    
+                    dicaAtiva = false; // o tabuleiro mudou, então a dica anterior não vale mais
+                    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
+
                     do{
+                        // detecta as combinações atuais e preenche o marcado
+                        tabuleiro_detectar_combinacoes(tabuleiro, marcado);
+
+                        // cada gema combinada vale 5 pontos:
+                        // trio = 15, quatro = 20, cinco = 25...
                         for(int i = 0; i < TAMANHO_TABULEIRO; i++){
                             for(int j = 0; j < TAMANHO_TABULEIRO; j++){
                                 if(marcado[i][j]){
-                                    pontuacao += 5; //adicionar +5 no score pra cara posição marcada com true (q são as q forma combinação)
-                                } 
+                                    pontuacao += 5;
+                                }
                             }
                         }
 
+                        // remove as gemas combinadas e desce as de cima
                         tabuleiro_remover_combinacoes(tabuleiro);
                         efeito_cascata(tabuleiro);
+
+                        // detecta novas combinações após a cascata
                         tabuleiro_detectar_combinacoes(tabuleiro, marcado);
                     }while(tabuleiro_tem_combinacao(marcado));
                 }
@@ -64,21 +173,58 @@ void jogo_atualizar(){
         }
 }
 
+// verifica se um clique ficou dentro de um botão  do menu
+static bool clique_no_botao_(Vector2 mouse, int y){
+    return (mouse.x >= MENU_BOTAO_X && mouse.x <= MENU_BOTAO_X + MENU_BOTAO_LARGURA &&
+            mouse.y >= y && mouse.y <= y + MENU_BOTAO_ALTURA);
+}
+
 void jogo_atualizar_telas(){
     switch(estadoAtual){
         case ESTADO_TELA_INICIAL:
+            // cliques nos botões es do menu
+            if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                Vector2 mouse = GetMousePosition();
+                if(clique_no_botao_(mouse, MENU_BOTAO_JOGAR_Y)){
+                    jogo_reiniciar(); // começa a partida -> ESTADO_JOGANDO
+                } else if(clique_no_botao_(mouse, MENU_BOTAO_INSTRUCOES_Y)){
+                    estadoAtual = ESTADO_INSTRUCOES;
+                } else if(clique_no_botao_(mouse, MENU_BOTAO_CONFIGURACOES_Y)){
+                    estadoAtual = ESTADO_CONFIGURACOES;
+                }
+            }
+            break;
+
         case ESTADO_INSTRUCOES:
+            // ESPAÇO volta para a tela inicial
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
+            }
+            break;
         case ESTADO_CONFIGURACOES:
-        case ESTADO_GAME_OVER:
+            // ESPAÇO volta para o menu principal
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
+            }
             break;
 
         case ESTADO_JOGANDO:
             jogo_atualizar();
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
+            }
             break;
 
         case ESTADO_PAUSADO:
-            if(IsKeyPressed(KEY_P)){ //se tiver oausado e clicar dnv pra despausar
+            if(IsKeyPressed(KEY_P)){ //se tiver pausado e clicar dnv pra despausar
                 estadoAtual = ESTADO_JOGANDO; 
+            }
+            break;
+
+        case ESTADO_GAME_OVER:
+            // ESPAÇO volta para a tela inicial
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
             }
             break;
     }
@@ -87,27 +233,41 @@ void jogo_atualizar_telas(){
 void jogo_renderizar(){
     switch(estadoAtual){
         case ESTADO_TELA_INICIAL:
+            renderizar_fundo(false);
             interface_tela_inicial();
             break;
 
         case ESTADO_INSTRUCOES:
+            renderizar_fundo(true);
             interface_tela_instrucoes();
             break;
 
         case ESTADO_CONFIGURACOES:
+            renderizar_fundo(true);
             interface_tela_configuracoes();
             break;
 
         case ESTADO_JOGANDO:
+            renderizar_fundo(true);
             renderizar(tabuleiro);
+            // desenha o destaque da dica nas células sugeridas, se estiver ativa
+            if(dicaAtiva){
+                renderizar_dica(dicaLinha1, dicaColuna1, dicaLinha2, dicaColuna2);
+            }
+            // desenha os botões de Dica e Desfazer ao lado do tabuleiro
+            renderizar_botoes_jogo();
+            // mostra a pontuação atual no topo
+            DrawText(TextFormat("Pontuacao: %i", pontuacao), 20, 20, 20, WHITE);
             break;
 
         case ESTADO_PAUSADO:
+            renderizar_fundo(true);
             renderizar(tabuleiro);
             DrawText("PAUSADO - aperte P para continuar", 20, 20, 20, WHITE); //ainda atualizar
             break;
 
         case ESTADO_GAME_OVER:
+            renderizar_fundo(true);
             interface_tela_final(pontuacao);
             break;
     }
@@ -117,10 +277,11 @@ void jogo_renderizar(){
 
 //aqui colocar a função de jogo encerrado
 bool jogo_encerrar(){
-     //ainda vai ser atualizada em jogo qd houver uma condição maior de parada do jogo, por enquanto ta aqui
-    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){ 
-        return true;
-    }
+    if (!tabuleiro_existe_jogada_possivel(tabuleiro))
+    {
+     return true; // não há mais jogadas possíveis, o jogo deve encerrar
+        }
+    
     return false;
 }
 
@@ -137,6 +298,13 @@ void jogo_reiniciar(){
     pontuacao = 0;
     linha1 = -1;
     coluna1 = -1;
+
+    // limpa o estado das mecânicas de dica e desfazer
+    dicaAtiva = false;
+    dicaLinha1 = dicaColuna1 = dicaLinha2 = dicaColuna2 = -1;
+    temBackup = false;
+    pontuacaoBackup = 0;
+
     estadoAtual = ESTADO_JOGANDO;
 }
 

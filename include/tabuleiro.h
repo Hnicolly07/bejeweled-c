@@ -24,6 +24,10 @@ bool tabuleiro_tem_combinacao(bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]
 
 bool tabuleiro_existe_jogada_possivel(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
 
+// copia o conteúdo de origem para destino (mesmas dimensões)
+void tabuleiro_copiar(Gema origem[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
+                      Gema destino[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
+
 bool gemas_vizinhas(int linha1, int coluna1, int linha2, int coluna2);
 
 void efeito_cascata(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
