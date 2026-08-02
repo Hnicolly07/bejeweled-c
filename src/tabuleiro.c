@@ -69,7 +69,13 @@ void tabuleiro_detectar_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TA
 }
 
 void tabuleiro_remover_combinacoes(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
-    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {false};
+    bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
+
+    for(int i=0;i<TAMANHO_TABULEIRO;i++){   //só pra preencher tudo com falso no inicio
+        for(int j=0;j<TAMANHO_TABULEIRO;j++){
+            marcado[i][j] = false;
+        }
+    }
 
     tabuleiro_detectar_combinacoes(tabuleiro, marcado);
 
@@ -165,6 +171,16 @@ bool tabuleiro_existe_jogada_possivel(Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_
         }
     }
     return false;
+}
+
+void tabuleiro_copiar(Gema origem[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
+                      Gema destino[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+    // copia célula a célula para o destino (mesmas dimensões)
+    for(int i = 0; i < TAMANHO_TABULEIRO; i++){
+        for(int j = 0; j < TAMANHO_TABULEIRO; j++){
+            destino[i][j] = origem[i][j];
+        }
+    }
 }
 
 bool gemas_vizinhas(int linha1, int coluna1, int linha2, int coluna2){

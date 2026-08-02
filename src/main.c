@@ -4,8 +4,9 @@
 #include <time.h>
 #include <gema.h>
 #include <tabuleiro.h>
-#include <render.h>
 #include <jogo.h>
+#include <audio.h>
+#include <render.h>
 
 int main(){
     // inicializar a janela
@@ -18,16 +19,23 @@ int main(){
 
     // pra funcionamento da função gema_sortear_tipo
     SetRandomSeed((unsigned int)time(NULL));
-
-    //sempre tem que carregar as texturas
+    //sempre tem que carregartd no inicio
     gema_carregar_texturas();
+
+    //inicializar o audio
+    InitAudioDevice();
+    carregar_sons();
+    tocar_musica_jogo();
 
     jogo_inicializar();
 
     //isso aq vai ficar rodando até q a janela seja fechada
-    while(!WindowShouldClose() && !jogo_encerrar()){
-        //lógica principal
-        jogo_atualizar();
+    while(!WindowShouldClose()){
+        //lógica principal (fluxo por estado/tela)
+        jogo_atualizar_telas();
+
+        //tem q ser cgamada aq pra manter a msc tocando
+        atualizar_musica_no_jogo();
         
         BeginDrawing();
         //vai mudar dps pro papel de parede
@@ -39,6 +47,9 @@ int main(){
     
     // e descarregar no final
     gema_descarregar_texturas();
+    renderizar_fundo_descarregar();
+    descarregar_sons();
+
     //fechar a janela
     CloseWindow();
 
