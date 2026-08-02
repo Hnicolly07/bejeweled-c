@@ -32,11 +32,20 @@ void interface_tela_inicial(){
              MENU_BOTAO_CONFIGURACOES_Y + 12, 20, WHITE);
 
     // rodapé no canto inferior da tela (nome dos alunos em vermelho)
-    DrawText("Alunos: Emilly Karoline, Hiorrana Nicolly e Iago de França", 120, GetScreenHeight() - 20, 20, LIGHTGRAY);
+    DrawText("Alunos: Emilly Karoline, Hiorrana Nicolly e Iago de França", 120, GetScreenHeight() - 20, 20, DARKGRAY);
 }
 
 void interface_tela_instrucoes(){
-    // tela em branco (apenas aberta) - 
+    // título da tela de instruções
+    desenhar_texto_centralizado("COMO JOGAR?", 40, 40, MAGENTA);
+
+    // instruções do jogo
+    desenhar_texto_centralizado("Troque os doces para formar trios de doces do mesmo tipo", 120, 20,DARKPURPLE  );
+    desenhar_texto_centralizado("Cada doce vale 5 pontos", 150, 20, DARKPURPLE  );
+    desenhar_texto_centralizado("Dica: destaca uma combinacao possivel (custa 10 pontos)", 180, 20, DARKPURPLE  );
+    desenhar_texto_centralizado("Desfazer: desfaz apenas a ultima jogada(custa 10 pontos)", 210, 20, DARKPURPLE  );
+    desenhar_texto_centralizado("O jogo encerra automaticamente quando nao ha mais jogadas possiveis", 240, 20, DARKPURPLE  );
+    desenhar_texto_centralizado("P pausa o jogo | ESPACO volta ao menu inicial", 270, 20, WHITE  );
 }
 
 void interface_tela_configuracoes(){
