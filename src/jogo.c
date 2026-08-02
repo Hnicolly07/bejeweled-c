@@ -3,12 +3,13 @@
 #include <raylib.h>
 #include <render.h>
 #include <interface.h>
+#include <audio.h>
 
 Gema tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
-int linha1 = -1; //um valor que não está entre os possiveis indices pra linha e coluna
-int coluna1 = -1;
+int linha1 = -1, coluna1 = -1; //um valor que não está entre os possiveis indices pra linha e coluna
 
 int pontuacao = 0;
+int recorde = 0;
 
 /* ===== ESTADO DAS MECÂNICAS DE DICA E DESFAZER =====*/
 // Dica: guarda as células sugeridas e se o destaque está ativo
@@ -26,6 +27,13 @@ bool temBackup = false;  // indica se existe um estado salvo para desfazer
 
 EstadoJogo estadoAtual = ESTADO_TELA_INICIAL; //o jogo começa na tela inicial (menu)
 
+static bool somAtivo = true;
+bool pausar = false;
+
+#define DURACAO_ANIMACAO_TROCA 0.25 // duração em segundos
+int animLinha1 = -1, animColuna1 = -1, animLinha2 = -1, animColuna2 = -1;
+double animInicio = 0;
+bool animAtiva = false;
 
 void jogo_inicializar(){
     tabuleiro_inicializar(tabuleiro);
@@ -121,6 +129,13 @@ void jogo_atualizar(){
             desfazer_jogada();
             return;
         }
+
+        //clique no botão de encerrar
+        if(mouse.x >= BOTAO_ENCERRAR_X && mouse.x <= BOTAO_ENCERRAR_X + BOTAO_LARGURA &&
+           mouse.y >= BOTAO_ENCERRAR_Y && mouse.y <= BOTAO_ENCERRAR_Y + BOTAO_ALTURA){
+            estadoAtual = ESTADO_GAME_OVER;
+            return;
+        }
     }
 
     int lin, col;
@@ -136,21 +151,35 @@ void jogo_atualizar(){
                 if(gemas_vizinhas(linha1,coluna1,linha2,coluna2) && troca_gera_trio(tabuleiro,linha1,coluna1,linha2,coluna2)){
                     salvar_estado(); // guarda o estado atual antes da jogada (para o desfazer)
                     trocar_gemas(tabuleiro,linha1, coluna1,linha2,coluna2);
+
                     dicaAtiva = false; // o tabuleiro mudou, então a dica anterior não vale mais
+
+                    animLinha1 = linha1;
+                    animColuna1 = coluna1;
+                    animLinha2 = linha2; 
+                    animColuna2 = coluna2;
+                    animInicio = GetTime();
+                    animAtiva = true;
+
                     bool marcado[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
 
                     do{
                         // detecta as combinações atuais e preenche o marcado
                         tabuleiro_detectar_combinacoes(tabuleiro, marcado);
 
-                        // cada gema combinada vale 5 pontos:
-                        // trio = 15, quatro = 20, cinco = 25...
+                        tocar_som_gemas_quebrando(tabuleiro_tem_combinacao(marcado));
+
                         for(int i = 0; i < TAMANHO_TABULEIRO; i++){
                             for(int j = 0; j < TAMANHO_TABULEIRO; j++){
                                 if(marcado[i][j]){
                                     pontuacao += 5;
                                 }
                             }
+                        }
+                        
+                        //atualizar o recorde do jogador
+                        if(pontuacao>recorde){
+                            recorde = pontuacao;
                         }
 
                         // remove as gemas combinadas e desce as de cima
@@ -168,7 +197,7 @@ void jogo_atualizar(){
             
         }
 
-        if(!tabuleiro_existe_jogada_possivel(tabuleiro)){
+        if(jogo_encerrar()){
             estadoAtual = ESTADO_GAME_OVER; //se n tiver mais jogada possivel, atualiza pra poder desenhar a tela final
         }
 }
@@ -203,21 +232,35 @@ void jogo_atualizar_telas(){
             break;
         case ESTADO_CONFIGURACOES:
             // ESPAÇO volta para o menu principal
+            if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                Vector2 mouse = GetMousePosition();
+                if(clique_no_botao_(mouse, CONFIG_BOTAO_SOM_Y)){
+                    somAtivo = !somAtivo;
+                    ativar_ou_desativar_musica(!somAtivo); // pausar = !somAtivo
+                }
+            }
+            // ESPAÇO volta para o menu principal
             if(IsKeyPressed(KEY_SPACE)){
                 estadoAtual = ESTADO_TELA_INICIAL;
             }
             break;
-
         case ESTADO_JOGANDO:
             jogo_atualizar();
             if(IsKeyPressed(KEY_SPACE)){
                 estadoAtual = ESTADO_TELA_INICIAL;
             }
+
+            if(IsKeyPressed(KEY_P)){
+                estadoAtual = ESTADO_PAUSADO;
+                ativar_ou_desativar_musica(true);
+            }
+            
             break;
 
         case ESTADO_PAUSADO:
             if(IsKeyPressed(KEY_P)){ //se tiver pausado e clicar dnv pra despausar
-                estadoAtual = ESTADO_JOGANDO; 
+                estadoAtual = ESTADO_JOGANDO;
+                ativar_ou_desativar_musica(false); 
             }
             break;
 
@@ -243,8 +286,8 @@ void jogo_renderizar(){
             break;
 
         case ESTADO_CONFIGURACOES:
-            renderizar_fundo(true);
-            interface_tela_configuracoes();
+           renderizar_fundo(true);
+           interface_tela_configuracoes(somAtivo);
             break;
 
         case ESTADO_JOGANDO:
@@ -254,6 +297,20 @@ void jogo_renderizar(){
             if(dicaAtiva){
                 renderizar_dica(dicaLinha1, dicaColuna1, dicaLinha2, dicaColuna2);
             }
+
+             if(linha1 != -1){
+                renderizar_selecao(linha1, coluna1);
+            }
+            // desenha a animação de troca
+            if(animAtiva){
+                double progresso = (GetTime() - animInicio) / DURACAO_ANIMACAO_TROCA;
+                if(progresso >= 1.0){
+                    animAtiva = false;
+                } else {
+                    renderizar_animacao_troca(animLinha1, animColuna1, animLinha2, animColuna2, (float)progresso);
+                }
+            }
+
             // desenha os botões de Dica e Desfazer ao lado do tabuleiro
             renderizar_botoes_jogo();
             // mostra a pontuação atual no topo
@@ -268,7 +325,7 @@ void jogo_renderizar(){
 
         case ESTADO_GAME_OVER:
             renderizar_fundo(true);
-            interface_tela_final(pontuacao);
+            interface_tela_final(pontuacao,recorde);
             break;
     }
     //renderizar(tabuleiro);
@@ -277,10 +334,9 @@ void jogo_renderizar(){
 
 //aqui colocar a função de jogo encerrado
 bool jogo_encerrar(){
-    if (!tabuleiro_existe_jogada_possivel(tabuleiro))
-    {
-     return true; // não há mais jogadas possíveis, o jogo deve encerrar
-        }
+    if (!tabuleiro_existe_jogada_possivel(tabuleiro)){
+        return true; // não há mais jogadas possíveis, o jogo deve encerrar
+    }
     
     return false;
 }

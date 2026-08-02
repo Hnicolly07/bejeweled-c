@@ -15,7 +15,8 @@ SRC = \
 	src/tabuleiro.c \
 	src/render.c \
 	src/jogo.c 	\
-	src/interface.c
+	src/interface.c \
+	src/audio.c
 
 CFLAGS = -Wall -Wextra -std=c11 \
 	-Iinclude \

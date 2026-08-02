@@ -10,13 +10,14 @@
 #define MENU_BOTAO_JOGAR_Y 130
 #define MENU_BOTAO_INSTRUCOES_Y 195
 #define MENU_BOTAO_CONFIGURACOES_Y 260
+#define CONFIG_BOTAO_SOM_Y 160
 
 void interface_tela_inicial();   
 
 void interface_tela_instrucoes();
 
-void interface_tela_configuracoes(); 
+void interface_tela_configuracoes(bool somaAtivo); 
 
-void interface_tela_final(int pontuacaoFinal);
+void interface_tela_final(int pontuacaoFinal, int recorde);
 
 #endif
