@@ -1,5 +1,3 @@
-//ESSE ARQUIVO SÓ PODERÁ SER TESTADO OU ALTERADO DEPOIS QUE A LÓGICA DE FUNCIONAMENTO DO JOGO ESTIVER FEITA
-
 #include "raylib.h"
 #include "audio.h"
 #include <stdio.h>
