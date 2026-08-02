@@ -24,8 +24,8 @@ int main(){
 
     //isso aq vai ficar rodando até q a janela seja fechada
     while(!WindowShouldClose() && !jogo_encerrar()){
-        //lógica principal
-        jogo_atualizar();
+        //lógica principal (fluxo por estado/tela)
+        jogo_atualizar_telas();
         
         BeginDrawing();
         //vai mudar dps pro papel de parede

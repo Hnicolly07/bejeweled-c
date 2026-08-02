@@ -24,7 +24,8 @@ bool temBackup = false;  // indica se existe um estado salvo para desfazer
 #define CUSTO_DICA 10
 #define CUSTO_DESFAZER 10
 
-EstadoJogo estadoAtual = ESTADO_JOGANDO; //primeira tela lá do enum, ainda n foi definida em interface
+EstadoJogo estadoAtual = ESTADO_TELA_INICIAL; //o jogo começa na tela inicial (menu)
+
 
 void jogo_inicializar(){
     tabuleiro_inicializar(tabuleiro);
@@ -172,21 +173,58 @@ void jogo_atualizar(){
         }
 }
 
+// verifica se um clique ficou dentro de um botão  do menu
+static bool clique_no_botao_(Vector2 mouse, int y){
+    return (mouse.x >= MENU_BOTAO_X && mouse.x <= MENU_BOTAO_X + MENU_BOTAO_LARGURA &&
+            mouse.y >= y && mouse.y <= y + MENU_BOTAO_ALTURA);
+}
+
 void jogo_atualizar_telas(){
     switch(estadoAtual){
         case ESTADO_TELA_INICIAL:
+            // cliques nos botões es do menu
+            if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                Vector2 mouse = GetMousePosition();
+                if(clique_no_botao_(mouse, MENU_BOTAO_JOGAR_Y)){
+                    jogo_reiniciar(); // começa a partida -> ESTADO_JOGANDO
+                } else if(clique_no_botao_(mouse, MENU_BOTAO_INSTRUCOES_Y)){
+                    estadoAtual = ESTADO_INSTRUCOES;
+                } else if(clique_no_botao_(mouse, MENU_BOTAO_CONFIGURACOES_Y)){
+                    estadoAtual = ESTADO_CONFIGURACOES;
+                }
+            }
+            break;
+
         case ESTADO_INSTRUCOES:
+            // ESPAÇO volta para a tela inicial
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
+            }
+            break;
         case ESTADO_CONFIGURACOES:
-        case ESTADO_GAME_OVER:
+            // ESPAÇO volta para o menu principal
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
+            }
             break;
 
         case ESTADO_JOGANDO:
             jogo_atualizar();
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
+            }
             break;
 
         case ESTADO_PAUSADO:
-            if(IsKeyPressed(KEY_P)){ //se tiver oausado e clicar dnv pra despausar
+            if(IsKeyPressed(KEY_P)){ //se tiver pausado e clicar dnv pra despausar
                 estadoAtual = ESTADO_JOGANDO; 
+            }
+            break;
+
+        case ESTADO_GAME_OVER:
+            // ESPAÇO volta para a tela inicial
+            if(IsKeyPressed(KEY_SPACE)){
+                estadoAtual = ESTADO_TELA_INICIAL;
             }
             break;
     }
@@ -239,10 +277,11 @@ void jogo_renderizar(){
 
 //aqui colocar a função de jogo encerrado
 bool jogo_encerrar(){
-     //ainda vai ser atualizada em jogo qd houver uma condição maior de parada do jogo, por enquanto ta aqui
-    if(!tabuleiro_existe_jogada_possivel(tabuleiro)){ 
-        return true;
-    }
+    if (!tabuleiro_existe_jogada_possivel(tabuleiro))
+    {
+     return true; // não há mais jogadas possíveis, o jogo deve encerrar
+        }
+    
     return false;
 }
 
