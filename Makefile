@@ -1,11 +1,5 @@
 CC = gcc
 
-# pra incluir o config.mk q vcs vão criar
--include config.mk
-
-ifndef RAYLIB_PATH
-$(error Crie um arquivo config.mk com o caminho da sua instalação da raylib)
-endif
 
 TARGET = bejeweled.exe
 
@@ -14,21 +8,21 @@ SRC = \
 	src/gema.c \
 	src/tabuleiro.c \
 	src/render.c \
-	src/jogo.c 	\
-	src/interface.c \
-	src/audio.c
+	src/jogo.c
 
 CFLAGS = -Wall -Wextra -std=c11 \
 	-Iinclude \
-	-Iinclude/raylib \
 	-I"$(RAYLIB_PATH)"
 
 LIBS = \
 	-L"$(RAYLIB_PATH)" \
 	-lraylib \
-	-lopengl32 \
-	-lgdi32 \
-	-lwinmm
+	-lGL \
+	-lm \
+	-lpthread \
+	-ldl \
+	-lrt \
+	-lX11
 
 .PHONY: all run clean
 
@@ -39,4 +33,4 @@ run: all
 	./$(TARGET)
 
 clean:
-	del /Q $(TARGET)
+	rm -f $(TARGET)
