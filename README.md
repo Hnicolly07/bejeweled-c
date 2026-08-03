@@ -116,3 +116,8 @@ make run
 - **src/**: arquivos .c, implementando as funcionalidades do jogo.
 
 ---
+# 6. Equipe
+
+- Hiorrana Nicolly de Santana
+- Emilly Karoline
+- Iago de França
